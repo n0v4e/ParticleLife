@@ -12,8 +12,8 @@ class Model {
     }
 
     initialize() {
-        Attraction.initialize(Config.simulation.attraction.randomize, Config.simulation.attraction.matrix);
-        this.scene.spawn(Config.simulation.particles.number);
+        Attraction.initialize();
+        this.scene.spawn();
         this.simulation.start();
     }
 

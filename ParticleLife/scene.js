@@ -1,6 +1,7 @@
 import { Random } from "./random.js";
 import { Particle } from "./particle.js";
 import { Vector2 } from "./vector2.js";
+import { Config } from "./config.js";
 
 class Scene {
     constructor(size, divider) {
@@ -14,9 +15,9 @@ class Scene {
         this.size = size;
     }
 
-    spawn(number) {
+    spawn() {
         this.objects = [];
-        for (let n = 0; n < number; ++n) {
+        for (let n = 0; n < Config.simulation.particles.number; ++n) {
             const x = Random.range(0, this.size.x);
             const y = Random.range(0, this.size.y);
             const particle = new Particle(new Vector2(x, y), this);
@@ -54,16 +55,36 @@ class Scene {
 
         for (let x = -range; x <= range; ++x) {
             for (let y = -range; y <= range; ++y) {
-                const posX = center.x + x;
-                const posY = center.y + y;
-                if (center.substract(new Vector2(posX, posY)).length() <= range) {
-                    if (posX >= 0 && posY >= 0 && posX < this.partitions.length && posY < this.partitions[posX].length) {
-                        partitions.push(this.partitions[posX][posY]);
+                let posX = center.x + x;
+                let posY = center.y + y;
+                let offset = new Vector2(0, 0);
+                if (center.substract(new Vector2(posX, posY)).length() <= range + 1) {
+                    while (posX < 0 || posX >= this.divider.x) {
+                        const direction = Math.sign(posX);
+                        posX -= direction * this.divider.x;
+                        offset.x -= direction;
                     }
+                    while (posY < 0 || posY >= this.divider.y) {
+                        const direction = Math.sign(posY);
+                        posY -= direction * this.divider.y;
+                        offset.y -= direction;
+                    }
+
+                    const particles = this.partitions[posX][posY];
+                    const partition = [...particles];
+
+                    // const partition = JSON.parse(JSON.stringify(particles));
+
+                    // for (const particle of partition) {
+                    //     particle.position.x += this.size.x * offset.x;
+                    //     particle.position.y += this.size.y * offset.y;
+                    // }
+
+                    partitions.push(partition);
+
                 }
             }
         }
-
         return partitions;
     }
 

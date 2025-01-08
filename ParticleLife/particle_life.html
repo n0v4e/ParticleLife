@@ -177,8 +177,13 @@
                     <tr>
                         <td colspan="3">
                             <button id="simulation_attraction_randomize" style="width: 200px;">Randomize</button>
-                            <button id="simulation_import" style="width: 200px;">Import</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
                             <button id="simulation_export" style="width: 200px;">Export</button>
+                            <input id="simulation_import" type="file" accept=".json"
+                                style="width: 200px;">Import</button>
                         </td>
                     </tr>
                 </table>
@@ -216,7 +221,7 @@
 
         function applyStyles() {
             for (const i of document.getElementsByTagName("button")) {
-                i.classList.add(...["rounded", "p-1", "my-1", "border-0"]);
+                i.classList.add(...["rounded", "p-1", "border-0"]);
                 i.style.background = "lightgray";
             }
 
@@ -226,7 +231,7 @@
         }
 
         const scene_spawn = get("scene_spawn");
-        scene_spawn.addEventListener("click", () => model.scene.spawn(Config.simulation.particles.number));
+        scene_spawn.addEventListener("click", () => model.scene.spawn());
 
         const simulation_toggle = get("simulation_toggle");
         const simulation_toggle_update = function () { simulation_toggle.innerHTML = model.simulation.enabled ? "Pause" : "Unpause"; };
@@ -244,7 +249,7 @@
         const simulation_particles_number = get("simulation_particles_number");
         simulation_particles_number.addEventListener("change", () => {
             Config.simulation.particles.number = get("simulation_particles_number").value;
-            model.scene.spawn(Config.simulation.particles.number);
+            model.scene.spawn();
         });
         simulation_particles_number.value = Config.simulation.particles.number;
 
@@ -262,7 +267,7 @@
             }
         });
         simulation_particles_range.min = 0;
-        simulation_particles_range.max = 256 * 100;
+        simulation_particles_range.max = 400 * 100;
         simulation_particles_range.value = Config.simulation.particles.range * 100;
 
         const simulation_particles_friction = get("simulation_particles_friction");
@@ -346,7 +351,7 @@
         const simulation_colors_apply_changes = get("simulation_colors_apply_changes");
         simulation_colors_apply_changes.onclick = function () {
             Config.simulation.particles.colors = simulation_particles_colors.value.split(",");
-            model.scene.spawn(Config.simulation.particles.number);
+            model.scene.spawn();
             Attraction.randomizeMatrix();
             createGrid();
         };
@@ -366,6 +371,31 @@
         scene_background_color.value = Config.display.clear.color;
         scene_background_color.onchange = function () { Config.display.clear.color = scene_background_color.value };
 
+        const simulation_export = get("simulation_export");
+        simulation_export.onclick = function () {
+            const object = { colors: Config.simulation.particles.colors, matrix: Attraction.matrix };
+            const blob = new Blob([JSON.stringify(object)], { type: 'text/json;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "particule-life.json";
+            link.click();
+            URL.revokeObjectURL(url);
+        };
+
+        const simulation_import = get("simulation_import");
+        simulation_import.onchange = function () {
+            const reader = new FileReader();
+            reader.onload = function () {
+                const json = JSON.parse(reader.result);
+                Config.simulation.particles.colors = json.colors;
+                model.scene.spawn();
+                Attraction.matrix = json.matrix
+                simulation_particles_colors.value = json.colors;
+                createGrid();
+            };
+            reader.readAsText(event.target.files[0], "UTF-8");
+        };
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
         integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"

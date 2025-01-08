@@ -5,13 +5,8 @@ class Attraction {
 
     static matrix = [];
 
-    static initialize(randomize, matrix) {
-        if (randomize) {
-            this.randomizeMatrix();
-        }
-        else {
-            this.matrix = matrix;
-        }
+    static initialize() {
+        this.randomizeMatrix();
     }
 
     static randomizeMatrix() {

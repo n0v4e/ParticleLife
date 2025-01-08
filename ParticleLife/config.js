@@ -5,7 +5,7 @@ class Config {
         delta: 16
     };
     static display = {
-        size: new Vector2(948, 948),
+        size: new Vector2(1100, 948),
         clear: {
             color: "rgb(20,20,20)",
             blur: 0.5,
@@ -28,32 +28,21 @@ class Config {
     static simulation = {
         particles: {
             number: 5000,
-            colors: ["red", "green", "lightblue"],
+            colors: ["red", "green", "lightblue", "yellow"],
             range: 56,
             beta: 0.3,
         },
-        attraction: {
-            randomize: true,
-            matrix: [
-                // [[0], [0], [0],],
-                // [[0], [0], [0],],
-                // [[0], [0], [0],],
-            ],
-        },
         physics: {
             dt: 0.5,
-            friction: 0.1,
+            friction: 0,
         },
     };
     static scene = {
-        size: new Vector2(948, 948),
+        size: new Vector2(1100, 948),
         partition: {
             divider: new Vector2(64, 64),
         }
     }
-    static solver = {
-        delta: 16,
-    };
 }
 
 export { Config };
